@@ -1,0 +1,30 @@
+spring:
+  application:
+    name: eureka
+
+eureka:
+  instance:
+    hostname: ${EUREKA_HOSTNAME:localhost}
+    preferIpAddress: false
+    statusPageUrlPath: /actuator/health
+    healthCheckUrl: http://${eureka.instance.hostname}:${server.port}/actuator/health
+  client:
+    register-with-eureka: false
+    fetch-registry: false
+  server:
+    response-cache-update-interval-ms: 0
+    enable-self-preservation: false
+
+server:
+  port: ${PORT:8761}
+  servlet:
+    context-path: /
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
