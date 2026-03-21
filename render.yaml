@@ -22,7 +22,7 @@ services:
     region: singapore
     dockerfilePath: ./keycloak/Dockerfile
     dockerContext: ./keycloak
-    dockerCommand: start --optimized --import-realm --http-enabled=true --http-port=8080 --hostname-strict=false --proxy-headers=xforwarded
+    dockerCommand: start --optimized --cache=local --import-realm --http-enabled=true --http-port=8080 --hostname-strict=false --proxy-headers=xforwarded
     healthCheckPath: /realms/master/.well-known/openid-configuration
     envVars:
       - key: PORT
