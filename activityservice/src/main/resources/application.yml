@@ -4,3 +4,38 @@ spring:
 
   config:
     import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+
+  data:
+    mongodb:
+      uri: ${ACTIVITY_MONGODB_URI:mongodb://localhost:27017/aiactivityfitness}
+      database: ${ACTIVITY_MONGODB_DB:aiactivityfitness}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+
+kafka:
+  topic:
+    name: ${KAFKA_ACTIVITY_TOPIC:activity-events}
+
+eureka:
+  client:
+    enabled: ${EUREKA_CLIENT_ENABLED:true}
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL:${EUREKA_EXTERNAL_URL:http://localhost:8761}/eureka/}
+
+  instance:
+    prefer-ip-address: false
+    hostname: ${SERVICE_HOSTNAME:${RENDER_EXTERNAL_HOSTNAME:localhost}}
+    non-secure-port-enabled: ${EUREKA_NON_SECURE_PORT_ENABLED:true}
+    secure-port-enabled: ${EUREKA_SECURE_PORT_ENABLED:false}
+    secure-port: ${EUREKA_SECURE_PORT:443}
+
+services:
+  user:
+    base-url: ${USER_SERVICE_BASE_URL:http://USER-SERVICE}
+
+server:
+  port: ${PORT:8082}

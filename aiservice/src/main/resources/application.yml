@@ -5,3 +5,43 @@ spring:
 
   config:
     import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:8888}"
+
+  data:
+    mongodb:
+      uri: ${AI_MONGODB_URI:mongodb://localhost:27017/aifintnessrecommendations}
+      database: ${AI_MONGODB_DB:aifintnessrecommendations}
+
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: activity-processor-group
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.use.type.headers: false
+        spring.json.value.default.type: com.fitness.aiservice.models.Activity
+        spring.json.trusted.packages: "*"
+
+kafka:
+  topic:
+    name: ${KAFKA_ACTIVITY_TOPIC:activity-events}
+
+gemini:
+  api:
+    url: ${GEMINI_API_URL:https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent}
+    key: ${GEMINI_API_KEY:}
+
+eureka:
+  client:
+    enabled: ${EUREKA_CLIENT_ENABLED:true}
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL:${EUREKA_EXTERNAL_URL:http://localhost:8761}/eureka/}
+  instance:
+    prefer-ip-address: false
+    hostname: ${SERVICE_HOSTNAME:${RENDER_EXTERNAL_HOSTNAME:localhost}}
+    non-secure-port-enabled: ${EUREKA_NON_SECURE_PORT_ENABLED:true}
+    secure-port-enabled: ${EUREKA_SECURE_PORT_ENABLED:false}
+    secure-port: ${EUREKA_SECURE_PORT:443}
+
+server:
+  port: ${PORT:8083}
