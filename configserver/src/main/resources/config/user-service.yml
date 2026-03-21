@@ -1,0 +1,25 @@
+spring:
+  datasource:
+    url: jdbc:${USER_DB_CONNECTION_STRING:postgresql://localhost:5432/fitness-micro-user}
+    username: ${USER_DB_USERNAME:postgres}
+    password: ${USER_DB_PASSWORD:1234}
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+eureka:
+  client:
+    enabled: ${EUREKA_CLIENT_ENABLED:true}
+    serviceUrl:
+      defaultZone: ${EUREKA_SERVER_URL:${EUREKA_EXTERNAL_URL:http://localhost:8761}/eureka/}
+  instance:
+    prefer-ip-address: false
+    hostname: ${SERVICE_HOSTNAME:${RENDER_EXTERNAL_HOSTNAME:localhost}}
+    non-secure-port-enabled: ${EUREKA_NON_SECURE_PORT_ENABLED:true}
+    secure-port-enabled: ${EUREKA_SECURE_PORT_ENABLED:false}
+    secure-port: ${EUREKA_SECURE_PORT:443}
+
+server:
+  port: ${PORT:8081}

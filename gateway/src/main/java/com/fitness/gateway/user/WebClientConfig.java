@@ -1,6 +1,7 @@
 package com.fitness.gateway.user;
 
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,8 +18,11 @@ public class WebClientConfig {
 
 
     @Bean
-    public WebClient webServiceWebClient(WebClient.Builder webClientBuilder){
-        return webClientBuilder.baseUrl("http://USER-SERVICE").build();
+    public WebClient webServiceWebClient(
+            WebClient.Builder webClientBuilder,
+            @Value("${services.user.base-url:http://USER-SERVICE}") String userServiceBaseUrl
+    ){
+        return webClientBuilder.baseUrl(userServiceBaseUrl).build();
     }
 
 }

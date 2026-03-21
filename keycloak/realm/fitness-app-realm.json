@@ -1,0 +1,11 @@
+{
+  "realm": "fitness-app",
+  "enabled": true,
+  "displayName": "Fitness App",
+  "registrationAllowed": true,
+  "registrationEmailAsUsername": true,
+  "loginWithEmailAllowed": true,
+  "duplicateEmailsAllowed": false,
+  "resetPasswordAllowed": true,
+  "editUsernameAllowed": false
+}
