@@ -22,11 +22,13 @@ services:
     region: singapore
     dockerfilePath: ./keycloak/Dockerfile
     dockerContext: ./keycloak
-    dockerCommand: start --optimized --cache=local --import-realm --http-enabled=true --http-port=8080 --hostname-strict=false --proxy-headers=xforwarded
-    healthCheckPath: /realms/master/.well-known/openid-configuration
+    dockerCommand: start-dev --cache=local --import-realm --http-enabled=true --http-port=8080 --hostname-strict=false --proxy-headers=xforwarded
+    healthCheckPath: /realms/fitness-app/.well-known/openid-configuration
     envVars:
       - key: PORT
         value: "8080"
+      - key: JAVA_OPTS_KC_HEAP
+        value: "-XX:InitialRAMPercentage=20 -XX:MaxRAMPercentage=35 -XX:MinRAMPercentage=15"
       - key: KC_BOOTSTRAP_ADMIN_USERNAME
         value: admin
       - key: KC_BOOTSTRAP_ADMIN_PASSWORD
