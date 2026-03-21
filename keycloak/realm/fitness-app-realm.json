@@ -7,5 +7,55 @@
   "loginWithEmailAllowed": true,
   "duplicateEmailsAllowed": false,
   "resetPasswordAllowed": true,
-  "editUsernameAllowed": false
+  "editUsernameAllowed": false,
+  "sslRequired": "external",
+  "clients": [
+    {
+      "clientId": "fitness-postman",
+      "name": "Fitness Postman Client",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": true,
+      "serviceAccountsEnabled": false,
+      "implicitFlowEnabled": false,
+      "redirectUris": [
+        "*"
+      ],
+      "webOrigins": [
+        "*"
+      ],
+      "defaultClientScopes": [
+        "profile",
+        "email",
+        "roles",
+        "web-origins"
+      ],
+      "optionalClientScopes": [
+        "address",
+        "phone",
+        "offline_access",
+        "microprofile-jwt"
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "fitness_test_user",
+      "enabled": true,
+      "emailVerified": true,
+      "firstName": "Fitness",
+      "lastName": "Tester",
+      "email": "fitness_test_user@example.com",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "Postman@123",
+          "temporary": false
+        }
+      ],
+      "requiredActions": []
+    }
+  ]
 }
