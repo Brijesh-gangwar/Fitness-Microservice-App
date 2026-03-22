@@ -23,7 +23,7 @@ services:
     dockerfilePath: ./keycloak/Dockerfile
     dockerContext: ./keycloak
     healthCheckPath: /realms/fitness-app/.well-known/openid-configuration
-    dockerCommand: /opt/keycloak/bin/kc.sh start --optimized --cache=local --http-enabled=true --http-host=0.0.0.0 --http-port=8080 --hostname-strict=false --proxy-headers=xforwarded
+    dockerCommand: /opt/keycloak/bin/kc.sh start --optimized --cache=local --import-realm --http-enabled=true --http-host=0.0.0.0 --http-port=8080 --hostname-strict=false --proxy-headers=xforwarded
     envVars:
       - key: PORT
         value: "8080"
