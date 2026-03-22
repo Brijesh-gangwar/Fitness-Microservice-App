@@ -1,0 +1,528 @@
+{
+  "info": {
+    "_postman_id": "d8c1e9a4-6f8f-4a2d-b40e-67f90114f8de",
+    "name": "Fitness App Render - New User Flow",
+    "description": "Import this collection in Postman and run folders top-to-bottom. It creates a new Keycloak user in the fitness-app realm, logs in, and calls gateway APIs.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "keycloak_base_url",
+      "value": "https://fitness-keycloak-9ucw.onrender.com"
+    },
+    {
+      "key": "gateway_base_url",
+      "value": "https://fitness-api-gateway.onrender.com"
+    },
+    {
+      "key": "realm",
+      "value": "fitness-app"
+    },
+    {
+      "key": "client_id",
+      "value": "fitness-postman"
+    },
+    {
+      "key": "kc_admin_username",
+      "value": "admin"
+    },
+    {
+      "key": "kc_admin_password",
+      "value": ""
+    },
+    {
+      "key": "new_user_password",
+      "value": "Postman@123"
+    },
+    {
+      "key": "admin_access_token",
+      "value": ""
+    },
+    {
+      "key": "access_token",
+      "value": ""
+    },
+    {
+      "key": "new_user_id",
+      "value": ""
+    },
+    {
+      "key": "new_username",
+      "value": ""
+    },
+    {
+      "key": "new_email",
+      "value": ""
+    },
+    {
+      "key": "new_first_name",
+      "value": "Fit"
+    },
+    {
+      "key": "new_last_name",
+      "value": "User"
+    },
+    {
+      "key": "keycloak_id",
+      "value": ""
+    },
+    {
+      "key": "activity_id",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "0) Keycloak Admin - Create New User",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const suffix = `${Date.now().toString().slice(-6)}${Math.floor(Math.random()*1000).toString().padStart(3,'0')}`;",
+              "pm.collectionVariables.set('new_username', `fit_user_${suffix}`);",
+              "pm.collectionVariables.set('new_email', `fit_user_${suffix}@example.com`);",
+              "pm.collectionVariables.set('new_first_name', 'Fit');",
+              "pm.collectionVariables.set('new_last_name', `User${suffix.slice(-3)}`);"
+            ]
+          }
+        }
+      ],
+      "item": [
+        {
+          "name": "Admin Token (master realm)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "client_id",
+                  "value": "admin-cli",
+                  "type": "text"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "{{kc_admin_username}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{kc_admin_password}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloak_base_url}}/realms/master/protocol/openid-connect/token",
+              "host": [
+                "{{keycloak_base_url}}"
+              ],
+              "path": [
+                "realms",
+                "master",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Admin token request successful', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('admin_access_token', json.access_token || '');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create User in fitness-app realm",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{new_username}}\",\n  \"email\": \"{{new_email}}\",\n  \"firstName\": \"{{new_first_name}}\",\n  \"lastName\": \"{{new_last_name}}\",\n  \"enabled\": true,\n  \"emailVerified\": true\n}"
+            },
+            "url": {
+              "raw": "{{keycloak_base_url}}/admin/realms/{{realm}}/users",
+              "host": [
+                "{{keycloak_base_url}}"
+              ],
+              "path": [
+                "admin",
+                "realms",
+                "{{realm}}",
+                "users"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('User created', function () {",
+                  "  pm.expect([201, 204]).to.include(pm.response.code);",
+                  "});",
+                  "const location = pm.response.headers.get('Location') || pm.response.headers.get('location');",
+                  "if (location) {",
+                  "  const userId = location.split('/').pop();",
+                  "  pm.collectionVariables.set('new_user_id', userId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Set Password for New User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{admin_access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"password\",\n  \"temporary\": false,\n  \"value\": \"{{new_user_password}}\"\n}"
+            },
+            "url": {
+              "raw": "{{keycloak_base_url}}/admin/realms/{{realm}}/users/{{new_user_id}}/reset-password",
+              "host": [
+                "{{keycloak_base_url}}"
+              ],
+              "path": [
+                "admin",
+                "realms",
+                "{{realm}}",
+                "users",
+                "{{new_user_id}}",
+                "reset-password"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Password set', function () {",
+                  "  pm.expect([204]).to.include(pm.response.code);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "1) Login as New User",
+      "item": [
+        {
+          "name": "Get Access Token (fitness-app)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "client_id",
+                  "value": "{{client_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "scope",
+                  "value": "openid profile email",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "{{new_username}}",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "{{new_user_password}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{keycloak_base_url}}/realms/{{realm}}/protocol/openid-connect/token",
+              "host": [
+                "{{keycloak_base_url}}"
+              ],
+              "path": [
+                "realms",
+                "{{realm}}",
+                "protocol",
+                "openid-connect",
+                "token"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('User token request successful', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('access_token', json.access_token || '');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get UserInfo",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{keycloak_base_url}}/realms/{{realm}}/protocol/openid-connect/userinfo",
+              "host": [
+                "{{keycloak_base_url}}"
+              ],
+              "path": [
+                "realms",
+                "{{realm}}",
+                "protocol",
+                "openid-connect",
+                "userinfo"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('UserInfo successful', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set('keycloak_id', json.sub || '');"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "2) Gateway APIs (Bearer Token)",
+      "item": [
+        {
+          "name": "Validate / Auto-Sync User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{gateway_base_url}}/api/users/{{keycloak_id}}/validate",
+              "host": [
+                "{{gateway_base_url}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "{{keycloak_id}}",
+                "validate"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Activity",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"RUNNING\",\n  \"duration\": 30,\n  \"caloriesBurned\": 240,\n  \"startTime\": \"2026-03-22T07:30:00\",\n  \"additionalMetrics\": {\n    \"distanceKm\": 5.2,\n    \"avgHeartRate\": 148\n  }\n}"
+            },
+            "url": {
+              "raw": "{{gateway_base_url}}/api/activities",
+              "host": [
+                "{{gateway_base_url}}"
+              ],
+              "path": [
+                "api",
+                "activities"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set('activity_id', json.id || '');",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Recommendations by User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{gateway_base_url}}/api/recommendations/user/{{keycloak_id}}",
+              "host": [
+                "{{gateway_base_url}}"
+              ],
+              "path": [
+                "api",
+                "recommendations",
+                "user",
+                "{{keycloak_id}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Recommendation by Activity",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "url": {
+              "raw": "{{gateway_base_url}}/api/recommendations/activity/{{activity_id}}",
+              "host": [
+                "{{gateway_base_url}}"
+              ],
+              "path": [
+                "api",
+                "recommendations",
+                "activity",
+                "{{activity_id}}"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

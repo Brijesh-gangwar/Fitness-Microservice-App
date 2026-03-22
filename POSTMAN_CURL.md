@@ -16,6 +16,7 @@ After redeploying Keycloak with this repo version, these will exist automaticall
 
 - `client_id`: `fitness-postman`
 - `username`: `fitness_test_user`
+
 - `password`: `Postman@123`
 
 ## 3) Postman Environment Variables
@@ -37,7 +38,7 @@ Create an Environment in Postman:
 ```bash
 curl --request POST \
   --url '{{keycloak_base_url}}/realms/{{realm}}/protocol/openid-connect/token' \
-  --header 'Content-Type: application/x-www-form-urlencoded' \
+  --header 'Content-Type: application/x-www-form-urlencoded' \ 
   --data-urlencode 'client_id={{client_id}}' \
   --data-urlencode 'grant_type=password' \
   --data-urlencode 'scope=openid profile email' \
