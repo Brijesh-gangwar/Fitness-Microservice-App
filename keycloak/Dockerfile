@@ -9,5 +9,5 @@ FROM quay.io/keycloak/keycloak:26.5.5
 COPY --from=builder /opt/keycloak/ /opt/keycloak/
 
 # Keep memory usage safe for Render free tier (512 MiB) to avoid OOM restarts.
-ENV JAVA_OPTS_KC_HEAP="-XX:InitialRAMPercentage=20 -XX:MaxRAMPercentage=60 -XX:MinRAMPercentage=10"
+ENV JAVA_OPTS_KC_HEAP="-XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=80 -XX:MinRAMPercentage=15"
 ENV KC_CACHE=local

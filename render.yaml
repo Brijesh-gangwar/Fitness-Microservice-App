@@ -28,7 +28,7 @@ services:
       - key: PORT
         value: "8080"
       - key: JAVA_OPTS_KC_HEAP
-        value: "-XX:InitialRAMPercentage=20 -XX:MaxRAMPercentage=60 -XX:MinRAMPercentage=10"
+        value: "-XX:InitialRAMPercentage=25 -XX:MaxRAMPercentage=80 -XX:MinRAMPercentage=15"
       - key: KC_BOOTSTRAP_ADMIN_USERNAME
         value: admin
       - key: KC_BOOTSTRAP_ADMIN_PASSWORD
